@@ -71,6 +71,7 @@ section .hint { font-size: 12px; color: #6b7280; margin-bottom: 14px; }
 .match-teams .mine { font-weight: 700; color: #1e3a8a; }
 .match-teams .opp { color: #4b5563; }
 .match-venue { font-size: 11px; color: #6b7280; margin-top: 2px; }
+.team-owners { font-size: 11px; color: #9ca3af; font-weight: 400; }
 .match-meta { display: flex; gap: 6px; align-items: center; }
 .group-tag { font-size: 10px; font-weight: 700; padding: 2px 6px; background: white; border: 1px solid #d1d5db; border-radius: 4px; color: #4b5563; }
 .tv-tag { font-size: 10px; color: #9ca3af; }
@@ -217,7 +218,8 @@ function setTab(key) {
 }
 
 // === Schedule rendering ===
-function renderSchedule(matches, myTeams) {
+function renderSchedule(matches, myTeams, teamOwners) {
+  teamOwners = teamOwners || {};
   if (matches.length === 0) return '<div class="empty-state">No matches yet.</div>';
   const mySet = new Set(myTeams || []);
   matches = [...matches].sort((a, b) => {
@@ -238,8 +240,10 @@ function renderSchedule(matches, myTeams) {
     const doubleMine = homeMine && awayMine;
     const homeFlag = FLAGS[m.home] || '';
     const awayFlag = FLAGS[m.away] || '';
-    const homeHtml = `<span class="${homeMine?'mine':'opp'}">${homeFlag} ${m.home}</span>`;
-    const awayHtml = `<span class="${awayMine?'mine':'opp'}">${awayFlag} ${m.away}</span>`;
+    const homeOwners = !homeMine && teamOwners[m.home] ? ` <span class="team-owners">(${teamOwners[m.home].join(', ')})</span>` : '';
+    const awayOwners = !awayMine && teamOwners[m.away] ? ` <span class="team-owners">(${teamOwners[m.away].join(', ')})</span>` : '';
+    const homeHtml = `<span class="${homeMine?'mine':'opp'}">${homeFlag} ${m.home}</span>${homeOwners}`;
+    const awayHtml = `<span class="${awayMine?'mine':'opp'}">${awayFlag} ${m.away}</span>${awayOwners}`;
     html += `
       <div class="match-card group-${m.group}${doubleMine?' double':''}">
         <div class="match-time">${m.time} ET</div>
@@ -283,6 +287,17 @@ function renderPlayerTab(player) {
   const myTeams = player.picks;
   const myMatches = ALL_MATCHES.filter(m => myTeams.includes(m.home) || myTeams.includes(m.away));
 
+  // Build team -> [owner handles] map (excluding current player)
+  const teamOwners = {};
+  POOL.forEach(p => {
+    if (p.key === player.key) return;
+    p.picks.forEach(t => {
+      if (!teamOwners[t]) teamOwners[t] = [];
+            const firstName = p.handle.replace(/ \\.*/, '');
+      if (!teamOwners[t].includes(firstName)) teamOwners[t].push(firstName);
+    });
+  });
+
   // Roster pills
   const rosterHtml = player.picks.map(t => {
     const mult = TEAMS_MULT[t];
@@ -298,7 +313,7 @@ function renderPlayerTab(player) {
     <section>
       <h2>${player.handle}'s Match Schedule</h2>
       <div class="hint">${myMatches.length} group-stage matches involving ${player.handle}'s teams. Times in ET. Color bar = group. Highlighted = both teams are theirs.</div>
-      ${renderSchedule(myMatches, myTeams)}
+      ${renderSchedule(myMatches, myTeams, teamOwners)}
     </section>
     <section>
       <h2>Pool Standings</h2>
