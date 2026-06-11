@@ -50,7 +50,7 @@ section .hint { font-size: 12px; color: #6b7280; margin-bottom: 14px; }
 .schedule-date-group:first-child { margin-top: 0; }
 .schedule-date-header { font-size: 12px; font-weight: 700; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; padding: 4px 0 6px; border-bottom: 1px solid #e5e7eb; margin-bottom: 6px; }
 .match-card {
-  display: grid; grid-template-columns: 90px 1fr auto; gap: 12px; align-items: center;
+  display: grid; grid-template-columns: minmax(90px, auto) 1fr auto; gap: 12px; align-items: center;
   padding: 10px 14px; background: #f9fafb; border-left: 4px solid #d1d5db; border-radius: 6px; font-size: 14px;
 }
 .match-card.group-A { border-left-color: #ef4444; }
@@ -67,6 +67,7 @@ section .hint { font-size: 12px; color: #6b7280; margin-bottom: 14px; }
 .match-card.group-L { border-left-color: #10b981; }
 .match-card.double { background: #fef3c7; border-left-color: #f59e0b; }
 .match-time { font-weight: 600; font-size: 13px; color: #1a1a2e; font-variant-numeric: tabular-nums; }
+.local-time { font-weight: 400; color: #6b7280; }
 .match-teams { font-size: 14px; }
 .match-teams .mine { font-weight: 700; color: #1e3a8a; }
 .match-teams .opp { color: #4b5563; }
@@ -120,6 +121,36 @@ table.standings .picks-cell { font-size: 12px; color: #6b7280; }
 .roster-pill.tier-4 { background: #fef2f2; } .roster-pill.tier-4 .pill-mult { background: #f87171; color: #7f1d1d; }
 
 .empty-state { padding: 32px; text-align: center; color: #9ca3af; font-size: 13px; font-style: italic; }
+
+/* Today's matches */
+.today-matches { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; }
+.today-match-card {
+  background: #f9fafb; border-radius: 12px; padding: 18px; border-left: 5px solid #d1d5db;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.today-match-card.group-A { border-left-color: #ef4444; }
+.today-match-card.group-B { border-left-color: #06b6d4; }
+.today-match-card.group-C { border-left-color: #84cc16; }
+.today-match-card.group-D { border-left-color: #f97316; }
+.today-match-card.group-E { border-left-color: #f59e0b; }
+.today-match-card.group-F { border-left-color: #14b8a6; }
+.today-match-card.group-G { border-left-color: #8b5cf6; }
+.today-match-card.group-H { border-left-color: #ec4899; }
+.today-match-card.group-I { border-left-color: #3b82f6; }
+.today-match-card.group-J { border-left-color: #6366f1; }
+.today-match-card.group-K { border-left-color: #d946ef; }
+.today-match-card.group-L { border-left-color: #10b981; }
+.today-match-time { font-size: 13px; font-weight: 700; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; }
+.today-match-teams { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.today-team { display: flex; flex-direction: column; align-items: center; gap: 6px; flex: 1; min-width: 0; }
+.today-flag { font-size: 48px; line-height: 1; }
+.today-team-name { font-size: 15px; font-weight: 700; text-align: center; color: #1a1a2e; }
+.today-team-name .owner-tag { display: block; font-size: 11px; font-weight: 400; color: #9ca3af; margin-top: 2px; }
+.today-team.mine .today-team-name { color: #1e3a8a; }
+.today-team.mine .today-flag { filter: drop-shadow(0 0 0 transparent); }
+.today-vs { font-size: 13px; font-weight: 700; color: #9ca3af; flex-shrink: 0; }
+.today-match-venue { font-size: 12px; color: #6b7280; text-align: center; }
+.today-match-meta { display: flex; gap: 6px; align-items: center; justify-content: center; }
 </style>
 </head>
 <body>
@@ -246,7 +277,7 @@ function renderSchedule(matches, myTeams, teamOwners) {
     const awayHtml = `<span class="${awayMine?'mine':'opp'}">${awayFlag} ${m.away}</span>${awayOwners}`;
     html += `
       <div class="match-card group-${m.group}${doubleMine?' double':''}">
-        <div class="match-time">${m.time} ET</div>
+        <div class="match-time">${formatMatchTime(m.date, m.time)}</div>
         <div>
           <div class="match-teams">${homeHtml} <span style="color:#9ca3af;">vs</span> ${awayHtml}</div>
           <div class="match-venue">${m.venue}</div>
@@ -323,9 +354,100 @@ function renderPlayerTab(player) {
   `;
 }
 
+// === Time zone helpers ===
+// All matches occur during EDT (UTC-4); tournament dates don't cross a DST boundary.
+function formatMatchTime(dateStr, timeStr) {
+  const m = timeStr.match(/(\d+):(\d+)\s*(AM|PM)/);
+  let h = parseInt(m[1], 10);
+  const min = parseInt(m[2], 10);
+  if (m[3] === 'PM' && h !== 12) h += 12;
+  if (m[3] === 'AM' && h === 12) h = 0;
+
+  const [y, mo, d] = dateStr.split('-').map(Number);
+  const utcDate = new Date(Date.UTC(y, mo - 1, d, h + 4, min));
+
+  const etStr = utcDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', timeZone: 'America/New_York' });
+  const localStr = utcDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+
+  if (localStr === etStr) return `${timeStr} ET`;
+
+  const tzParts = utcDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', timeZoneName: 'short' }).split(' ');
+  const tzAbbr = tzParts[tzParts.length - 1];
+  return `${localStr} ${tzAbbr}`;
+}
+
+// === Today's matches ===
+function getTodayDateStr() {
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
+function buildGlobalTeamOwners() {
+  const map = {};
+  POOL.forEach(p => {
+    const firstName = p.handle.replace(/ \\.*/, '');
+    p.picks.forEach(t => {
+      if (!map[t]) map[t] = [];
+      if (!map[t].includes(firstName)) map[t].push(firstName);
+    });
+  });
+  return map;
+}
+
+function renderTodayMatches() {
+  const todayStr = getTodayDateStr();
+  const todayMatches = ALL_MATCHES.filter(m => m.date === todayStr).sort((a, b) => {
+    const toMin = t => { const [h, mi] = t.replace(/ (AM|PM)/, '').split(':').map(Number); const isPM = t.includes('PM'); return ((isPM && h !== 12 ? h + 12 : (!isPM && h === 12 ? 0 : h)) * 60) + mi; };
+    return toMin(a.time) - toMin(b.time);
+  });
+
+  if (todayMatches.length === 0) {
+    return '<div class="empty-state">No matches scheduled for today.</div>';
+  }
+
+  const teamOwners = buildGlobalTeamOwners();
+  const cards = todayMatches.map(m => {
+    const homeFlag = FLAGS[m.home] || '';
+    const awayFlag = FLAGS[m.away] || '';
+    const homeOwners = teamOwners[m.home] ? `<span class="owner-tag">${teamOwners[m.home].join(', ')}</span>` : '';
+    const awayOwners = teamOwners[m.away] ? `<span class="owner-tag">${teamOwners[m.away].join(', ')}</span>` : '';
+    return `
+      <div class="today-match-card group-${m.group}">
+        <div class="today-match-time">${formatMatchTime(m.date, m.time)}</div>
+        <div class="today-match-teams">
+          <div class="today-team">
+            <div class="today-flag">${homeFlag}</div>
+            <div class="today-team-name">${m.home}${homeOwners}</div>
+          </div>
+          <div class="today-vs">VS</div>
+          <div class="today-team">
+            <div class="today-flag">${awayFlag}</div>
+            <div class="today-team-name">${m.away}${awayOwners}</div>
+          </div>
+        </div>
+        <div class="today-match-venue">${m.venue}</div>
+        <div class="today-match-meta">
+          <span class="group-tag">Group ${m.group}</span>
+          ${m.tv ? `<span class="tv-tag">${m.tv}</span>` : ''}
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  return `<div class="today-matches">${cards}</div>`;
+}
+
 // === Summary tab content ===
 function renderSummaryTab() {
   return `
+    <section>
+      <h2>⚽ Today's Matches</h2>
+      ${renderTodayMatches()}
+    </section>
+
     <section>
       <h2>Tournament Overview</h2>
       <div class="tournament-info">
@@ -427,4 +549,3 @@ renderActive();
 </script>
 </body>
 </html>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
