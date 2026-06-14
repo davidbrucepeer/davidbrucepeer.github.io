@@ -316,7 +316,11 @@ function renderStandings(highlightKey) {
 // === Player tab content ===
 function renderPlayerTab(player) {
   const myTeams = player.picks;
-  const myMatches = ALL_MATCHES.filter(m => myTeams.includes(m.home) || myTeams.includes(m.away));
+  const now = new Date();
+  const myMatches = ALL_MATCHES.filter(m =>
+    (myTeams.includes(m.home) || myTeams.includes(m.away)) &&
+    getMatchInstant(m.date, m.time) > now
+  );
 
   // Build team -> [owner handles] map (excluding current player)
   const teamOwners = {};
@@ -343,7 +347,7 @@ function renderPlayerTab(player) {
     </section>
     <section>
       <h2>${player.handle}'s Match Schedule</h2>
-      <div class="hint">${myMatches.length} group-stage matches involving ${player.handle}'s teams. Times in ET. Color bar = group. Highlighted = both teams are theirs.</div>
+      <div class="hint">${myMatches.length} upcoming match${myMatches.length !== 1 ? 'es' : ''} involving ${player.handle}'s teams. Times in ET. Color bar = group. Highlighted = both teams are theirs.</div>
       ${renderSchedule(myMatches, myTeams, teamOwners)}
     </section>
     <section>
