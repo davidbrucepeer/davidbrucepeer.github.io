@@ -120,6 +120,18 @@ table.standings .picks-cell { font-size: 12px; color: #6b7280; }
 .roster-pill.tier-3 { background: #fff7ed; } .roster-pill.tier-3 .pill-mult { background: #fb923c; color: #7c2d12; }
 .roster-pill.tier-4 { background: #fef2f2; } .roster-pill.tier-4 .pill-mult { background: #f87171; color: #7f1d1d; }
 
+/* Roster table */
+table.roster-table { table-layout: fixed; }
+table.roster-table .team-col { width: 30%; }
+table.roster-table .mult-col { width: 16%; }
+table.roster-table .stage-col { width: 26%; }
+table.roster-table .raw-col, table.roster-table .pool-col { width: 14%; }
+.mult-badge { display: inline-block; padding: 2px 9px; border-radius: 10px; font-weight: 700; font-size: 12px; }
+.mult-badge.tier-1 { background: #fbbf24; color: #78350f; }
+.mult-badge.tier-2 { background: #60a5fa; color: #1e3a8a; }
+.mult-badge.tier-3 { background: #fb923c; color: #7c2d12; }
+.mult-badge.tier-4 { background: #f87171; color: #7f1d1d; }
+
 .empty-state { padding: 32px; text-align: center; color: #9ca3af; font-size: 13px; font-style: italic; }
 
 /* Today's matches */
@@ -258,6 +270,10 @@ const FLAGS = {
 
 // Scoring
 const PTS_BY_KEY = {'group':0, 'out_group':0, 'r32':2, 'r16':5, 'qf':9, 'sf':14, 'f':20, 'win':28};
+const STAGE_LABELS = {
+  'group': 'Group Stage', 'out_group': 'Eliminated (Groups)', 'r32': 'Round of 32',
+  'r16': 'Round of 16', 'qf': 'Quarterfinals', 'sf': 'Semifinals', 'f': 'Final', 'win': 'Champion'
+};
 
 // === Team status ===
 // The furthest round each team has been confirmed to reach. Same for every
@@ -381,6 +397,35 @@ function renderStandings(highlightKey) {
   </table>`;
 }
 
+// === Roster table ===
+function renderRosterTable(player) {
+  const rows = player.picks.map(t => {
+    const mult = TEAMS_MULT[t];
+    const flag = FLAGS[t] || '';
+    const status = statusFor(t);
+    const stageLabel = STAGE_LABELS[status] || status;
+    const rawPoints = PTS_BY_KEY[status] || 0;
+    const poolPoints = pointsFor(t);
+    return `<tr>
+      <td>${flag} ${t}</td>
+      <td class="mult-cell"><span class="mult-badge tier-${mult}">${mult}x</span></td>
+      <td>${stageLabel}</td>
+      <td class="points-cell">${rawPoints}</td>
+      <td class="points-cell">${poolPoints}</td>
+    </tr>`;
+  }).join('');
+  return `<table class="standings roster-table">
+    <thead><tr>
+      <th class="team-col">Team</th>
+      <th class="mult-col">Multiplier</th>
+      <th class="stage-col">Stage Reached</th>
+      <th class="points-cell raw-col">Raw Points</th>
+      <th class="points-cell pool-col">Pool Points</th>
+    </tr></thead>
+    <tbody>${rows}</tbody>
+  </table>`;
+}
+
 // === Player tab content ===
 function renderPlayerTab(player) {
   const myTeams = player.picks;
@@ -401,12 +446,8 @@ function renderPlayerTab(player) {
     });
   });
 
-  // Roster pills
-  const rosterHtml = player.picks.map(t => {
-    const mult = TEAMS_MULT[t];
-    const flag = FLAGS[t] || '';
-    return `<span class="roster-pill tier-${mult}">${flag} ${t} <span class="pill-mult">${mult}x</span></span>`;
-  }).join('');
+  // Roster table
+  const rosterHtml = renderRosterTable(player);
 
   return `
     <section>
@@ -417,11 +458,6 @@ function renderPlayerTab(player) {
       <h2>${player.handle}'s Match Schedule</h2>
       <div class="hint">${myMatches.length} upcoming match${myMatches.length !== 1 ? 'es' : ''} involving ${player.handle}'s teams. Times in ET. Color bar = group. Highlighted = both teams are theirs.</div>
       ${renderSchedule(myMatches, myTeams, teamOwners)}
-    </section>
-    <section>
-      <h2>Pool Standings</h2>
-      <div class="hint">All 16 players. ${player.handle} highlighted.</div>
-      ${renderStandings(player.key)}
     </section>
   `;
 }
