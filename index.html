@@ -123,10 +123,10 @@ table.standings .picks-cell { font-size: 12px; color: #6b7280; }
 .empty-state { padding: 32px; text-align: center; color: #9ca3af; font-size: 13px; font-style: italic; }
 
 /* Today's matches */
-.today-matches { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; }
+.today-matches { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; }
 .today-match-card {
-  background: #f9fafb; border-radius: 12px; padding: 18px; border-left: 5px solid #d1d5db;
-  display: flex; flex-direction: column; gap: 10px;
+  background: #f9fafb; border-radius: 10px; padding: 10px; border-left: 4px solid #d1d5db;
+  display: flex; flex-direction: column; gap: 6px;
 }
 .today-match-card.group-A { border-left-color: #ef4444; }
 .today-match-card.group-B { border-left-color: #06b6d4; }
@@ -140,17 +140,36 @@ table.standings .picks-cell { font-size: 12px; color: #6b7280; }
 .today-match-card.group-J { border-left-color: #6366f1; }
 .today-match-card.group-K { border-left-color: #d946ef; }
 .today-match-card.group-L { border-left-color: #10b981; }
-.today-match-time { font-size: 13px; font-weight: 700; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; }
-.today-match-teams { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-.today-team { display: flex; flex-direction: column; align-items: center; gap: 6px; flex: 1; min-width: 0; }
-.today-flag { font-size: 48px; line-height: 1; }
-.today-team-name { font-size: 15px; font-weight: 700; text-align: center; color: #1a1a2e; }
-.today-team-name .owner-tag { display: block; font-size: 11px; font-weight: 400; color: #9ca3af; margin-top: 2px; }
+.today-match-time { font-size: 10px; font-weight: 700; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; }
+.today-match-teams { display: flex; align-items: center; justify-content: space-between; gap: 4px; }
+.today-team { display: flex; flex-direction: column; align-items: center; gap: 3px; flex: 1; min-width: 0; }
+.today-flag { font-size: 26px; line-height: 1; }
+.today-team-name { font-size: 11px; font-weight: 700; text-align: center; color: #1a1a2e; }
+.today-team-name .owner-tag { display: block; font-size: 9px; font-weight: 400; color: #9ca3af; margin-top: 1px; }
 .today-team.mine .today-team-name { color: #1e3a8a; }
 .today-team.mine .today-flag { filter: drop-shadow(0 0 0 transparent); }
-.today-vs { font-size: 13px; font-weight: 700; color: #9ca3af; flex-shrink: 0; }
-.today-match-venue { font-size: 12px; color: #6b7280; text-align: center; }
-.today-match-meta { display: flex; gap: 6px; align-items: center; justify-content: center; }
+.today-vs { font-size: 10px; font-weight: 700; color: #9ca3af; flex-shrink: 0; }
+.today-match-venue { font-size: 9px; color: #6b7280; text-align: center; }
+.today-match-meta { display: flex; gap: 4px; align-items: center; justify-content: center; flex-wrap: wrap; }
+
+/* Knockout bracket */
+.bracket-wrap { overflow-x: auto; padding-bottom: 6px; }
+.bracket { display: flex; align-items: stretch; gap: 4px; min-width: 0; }
+.bracket-side { display: flex; gap: 4px; flex: 4 1 0; min-width: 0; }
+.bracket-round-col { display: flex; flex-direction: column; flex: 1; min-width: 0; }
+.bracket-round { display: flex; flex-direction: column; justify-content: space-around; gap: 6px; flex: 1; min-width: 0; }
+.bracket-round-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #6b7280; text-align: center; margin-bottom: 4px; }
+.bracket-match {
+  background: #f9fafb; border: 1px solid #e5e7eb; border-left: 4px solid #94a3b8; border-radius: 6px;
+  padding: 4px; display: flex; flex-direction: column; gap: 2px;
+}
+.bracket-team {
+  display: flex; align-items: center; justify-content: center; gap: 4px; padding: 4px; background: #f3f4f6; border-radius: 4px;
+  font-size: 11px; font-weight: 600; color: #1a1a2e; min-height: 30px;
+}
+.bracket-flag { font-size: 24px; line-height: 1; }
+.bracket-final-col { display: flex; flex-direction: column; align-items: stretch; flex: 1 1 0; min-width: 0; }
+.bracket-final-match-wrap { flex: 1; display: flex; flex-direction: column; justify-content: center; }
 </style>
 </head>
 <body>
@@ -188,6 +207,44 @@ const TEAMS_MULT = {"Spain": 1, "Argentina": 1, "France": 1, "England": 1, "Braz
 const TEAM_GROUP = {"Mexico": "A", "South Africa": "A", "South Korea": "A", "Czech Republic": "A", "Canada": "B", "Bosnia and Herzegovina": "B", "Qatar": "B", "Switzerland": "B", "Brazil": "C", "Morocco": "C", "Haiti": "C", "Scotland": "C", "United States": "D", "Paraguay": "D", "Australia": "D", "Turkey": "D", "Germany": "E", "Curacao": "E", "Ivory Coast": "E", "Ecuador": "E", "Netherlands": "F", "Japan": "F", "Sweden": "F", "Tunisia": "F", "Belgium": "G", "Egypt": "G", "Iran": "G", "New Zealand": "G", "Spain": "H", "Cape Verde": "H", "Saudi Arabia": "H", "Uruguay": "H", "France": "I", "Senegal": "I", "Iraq": "I", "Norway": "I", "Argentina": "J", "Algeria": "J", "Austria": "J", "Jordan": "J", "Portugal": "K", "DR Congo": "K", "Uzbekistan": "K", "Colombia": "K", "England": "L", "Croatia": "L", "Ghana": "L", "Panama": "L"};
 const POOL = [{"key": "duke", "handle": "Duke \\ The Newsman", "picks": ["France", "Mexico", "Ivory Coast", "Czech Republic", "Ghana", "Jordan"]}, {"key": "jason", "handle": "Jason \\ Floyd Pepper", "picks": ["Brazil", "Switzerland", "Sweden", "Croatia", "Scotland", "Iraq"]}, {"key": "kit", "handle": "Kit \\ Wayne", "picks": ["Spain", "Portugal", "Ivory Coast", "Austria", "South Korea", "Jordan"]}, {"key": "evan", "handle": "Evan \\ Crazy Harry", "picks": ["France", "Portugal", "Egypt", "Canada", "Australia", "Curacao"]}, {"key": "ed", "handle": "Ed \\ Pops", "picks": ["Japan", "Mexico", "Paraguay", "Algeria", "Iran", "Iraq"]}, {"key": "shane", "handle": "Shane \\ Wanda", "picks": ["Argentina", "Germany", "Senegal", "Cape Verde", "DR Congo", "Haiti"]}, {"key": "miller", "handle": "Miller \\ Bobo", "picks": ["Germany", "Netherlands", "Croatia", "Scotland", "Panama", "Curacao"]}, {"key": "kate", "handle": "Kate \\ Lew Zealand", "picks": ["Spain", "United States", "Turkey", "Sweden", "DR Congo", "Qatar"]}, {"key": "sabine", "handle": "Sabine \\ The Penguins", "picks": ["England", "Turkey", "Ecuador", "Paraguay", "South Africa", "Haiti"]}, {"key": "julien", "handle": "Julien \\ Link Hogthrob", "picks": ["Uruguay", "United States", "Algeria", "South Korea", "Tunisia", "Qatar"]}, {"key": "drama", "handle": "Drama \\ Robin the Frog", "picks": ["Colombia", "Brazil", "Austria", "Senegal", "Australia", "Panama"]}, {"key": "liz", "handle": "Liz \\ Beauregard", "picks": ["England", "Uruguay", "Bosnia and Herzegovina", "Czech Republic", "Saudi Arabia", "Uzbekistan"]}, {"key": "dp", "handle": "DP \\ Dr. Teeth", "picks": ["Norway", "Switzerland", "Bosnia and Herzegovina", "Canada", "South Africa", "New Zealand"]}, {"key": "dom", "handle": "Dom \\ Sweetums", "picks": ["Colombia", "Japan", "Netherlands", "Belgium", "Saudi Arabia", "Uzbekistan"]}, {"key": "scott", "handle": "Scott \\ Marvin Suggs", "picks": ["Argentina", "Norway", "Egypt", "Ghana", "Tunisia", "Cape Verde"]}, {"key": "pat", "handle": "Pat \\ Uncle Deadly", "picks": ["Morocco", "Morocco", "Ecuador", "Belgium", "Iran", "New Zealand"]}];
 
+// === Knockout bracket ===
+// 32 slots split into two 16-team halves that converge at the Final.
+// Fill in team names manually as group results / knockout matches are confirmed.
+// Empty string = not yet determined.
+const BRACKET = {
+  left: {
+    r32: [
+      ['Germany', ''],
+      ['', ''],
+      ['', ''],
+      ['', ''],
+      ['', ''],
+      ['', ''],
+      ['United States', ''],
+      ['', '']
+    ],
+    r16: Array.from({length: 4}, () => ['', '']),
+    qf: Array.from({length: 2}, () => ['', '']),
+    sf: [['', '']]
+  },
+  right: {
+    r32: [
+      ['', ''],
+      ['', ''],
+      ['Mexico', ''],
+      ['', ''],
+      ['', ''],
+      ['', ''],
+      ['', ''],
+      ['', '']
+    ],
+    r16: Array.from({length: 4}, () => ['', '']),
+    qf: Array.from({length: 2}, () => ['', '']),
+    sf: [['', '']]
+  },
+  final: ['', '']
+};
+
 const FLAGS = {
   'France':'🇫🇷','Mexico':'🇲🇽','Ivory Coast':'🇨🇮','Czech Republic':'🇨🇿','Ghana':'🇬🇭','New Zealand':'🇳🇿',
   'Brazil':'🇧🇷','Switzerland':'🇨🇭','Sweden':'🇸🇪','Croatia':'🇭🇷','Spain':'🇪🇸','Portugal':'🇵🇹',
@@ -202,16 +259,27 @@ const FLAGS = {
 // Scoring
 const PTS_BY_KEY = {'group':0, 'out_group':0, 'r32':2, 'r16':5, 'qf':9, 'sf':14, 'f':20, 'win':28};
 
-// State
+// === Team status ===
+// The furthest round each team has been confirmed to reach. Same for every
+// visitor (baked in, not per-browser) — update this as results come in.
+// Valid values: 'group' (default/no entry needed), 'out_group' (eliminated
+// in groups), 'r32', 'r16', 'qf', 'sf', 'f', 'win'.
+const TEAM_STATUS = {
+  'Mexico': 'r32',
+  'United States': 'r32',
+  'Germany': 'r32'
+};
+
+// State (just UI state — which tab is active — not scoring data)
 const STORAGE_KEY = 'wc2026_tracker_unified_v1';
 function loadState() {
   try { const r = localStorage.getItem(STORAGE_KEY); if (r) return JSON.parse(r); } catch(e){}
-  return { teamStatus: {}, activeTab: 'summary' };
+  return { activeTab: 'summary' };
 }
 function saveState() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
 let state = loadState();
 
-function statusFor(name) { return state.teamStatus[name] || 'group'; }
+function statusFor(name) { return TEAM_STATUS[name] || 'group'; }
 function pointsFor(name) {
   const mult = TEAMS_MULT[name];
   if (!mult) return 0;
@@ -473,6 +541,47 @@ function renderTodayMatches() {
   return `<div class="today-matches">${cards}</div>`;
 }
 
+// === Knockout bracket rendering ===
+function bracketTeamHtml(name) {
+  if (!name) return `<div class="bracket-team empty"></div>`;
+  const flag = FLAGS[name] || '';
+  return `<div class="bracket-team" title="${name}"><span class="bracket-flag">${flag}</span></div>`;
+}
+
+function renderBracketMatch(pair, roundClass) {
+  const [a, b] = pair;
+  return `<div class="bracket-match round-${roundClass}">${bracketTeamHtml(a)}${bracketTeamHtml(b)}</div>`;
+}
+
+function renderBracketRound(matches, roundClass, label) {
+  const matchesHtml = matches.map(m => renderBracketMatch(m, roundClass)).join('');
+  return `<div class="bracket-round-col"><div class="bracket-round-label">${label}</div><div class="bracket-round">${matchesHtml}</div></div>`;
+}
+
+function renderBracket() {
+  const b = BRACKET;
+  const leftHtml = `
+    <div class="bracket-side">
+      ${renderBracketRound(b.left.r32, 'r32', 'Round of 32')}
+      ${renderBracketRound(b.left.r16, 'r16', 'Round of 16')}
+      ${renderBracketRound(b.left.qf, 'qf', 'Quarterfinals')}
+      ${renderBracketRound(b.left.sf, 'sf', 'Semifinals')}
+    </div>`;
+  const rightHtml = `
+    <div class="bracket-side">
+      ${renderBracketRound(b.right.sf, 'sf', 'Semifinals')}
+      ${renderBracketRound(b.right.qf, 'qf', 'Quarterfinals')}
+      ${renderBracketRound(b.right.r16, 'r16', 'Round of 16')}
+      ${renderBracketRound(b.right.r32, 'r32', 'Round of 32')}
+    </div>`;
+  const finalHtml = `
+    <div class="bracket-final-col">
+      <div class="bracket-round-label">Final</div>
+      <div class="bracket-final-match-wrap">${renderBracketMatch(b.final, 'final')}</div>
+    </div>`;
+  return `<div class="bracket-wrap"><div class="bracket">${leftHtml}${finalHtml}${rightHtml}</div></div>`;
+}
+
 // === Summary tab content ===
 function renderSummaryTab() {
   return `
@@ -482,47 +591,8 @@ function renderSummaryTab() {
     </section>
 
     <section>
-      <h2>Tournament Overview</h2>
-      <div class="tournament-info">
-        <div class="info-card">
-          <div class="label">Format</div>
-          <div class="value">48 teams</div>
-          <div class="value-detail">12 groups of 4 → top 2 + 8 best 3rd</div>
-        </div>
-        <div class="info-card">
-          <div class="label">Hosts</div>
-          <div class="value">🇺🇸 🇨🇦 🇲🇽</div>
-          <div class="value-detail">USA · Canada · Mexico</div>
-        </div>
-        <div class="info-card">
-          <div class="label">Total matches</div>
-          <div class="value">104</div>
-          <div class="value-detail">72 group · 32 knockout</div>
-        </div>
-        <div class="info-card">
-          <div class="label">Pool</div>
-          <div class="value">16 players</div>
-          <div class="value-detail">6 picks each, snake draft</div>
-        </div>
-      </div>
-    </section>
-
-    <section>
-      <h2>Key Dates</h2>
-      <div class="hint">All times Eastern. Watch for the gold milestone markers.</div>
-      <div class="key-dates">
-        <div class="key-date milestone"><div class="key-date-date">Thu Jun 11</div><div><div class="key-date-event">⚽ Tournament opens</div><div class="key-date-detail">Mexico vs South Africa · 3 PM · Estadio Azteca, Mexico City</div></div><div class="key-date-note">First whistle</div></div>
-        <div class="key-date"><div class="key-date-date">Jun 11 – 27</div><div><div class="key-date-event">Group stage</div><div class="key-date-detail">72 matches across 12 groups, ~6 per day</div></div></div>
-        <div class="key-date"><div class="key-date-date">Mon Jun 15</div><div><div class="key-date-event">Group of Death opens</div><div class="key-date-detail">Belgium vs Egypt · France's Group I starts Jun 16</div></div></div>
-        <div class="key-date"><div class="key-date-date">Sat Jun 27</div><div><div class="key-date-event">Final group games</div><div class="key-date-detail">All Group J, K, L matchday 3 — bracket gets set</div></div></div>
-        <div class="key-date milestone"><div class="key-date-date">Sun Jun 28</div><div><div class="key-date-event">🏟️ Round of 32 begins</div><div class="key-date-detail">First knockout round — 8 of 12 third-place teams advance</div></div></div>
-        <div class="key-date"><div class="key-date-date">Fri Jul 3</div><div><div class="key-date-event">R32 ends</div><div class="key-date-detail">Field down to 16</div></div></div>
-        <div class="key-date milestone"><div class="key-date-date">Sat Jul 4</div><div><div class="key-date-event">🏟️ Round of 16 begins</div><div class="key-date-detail">3 days, 8 matches</div></div></div>
-        <div class="key-date"><div class="key-date-date">Thu Jul 9</div><div><div class="key-date-event">Quarterfinals begin</div><div class="key-date-detail">4 matches over 3 days</div></div></div>
-        <div class="key-date"><div class="key-date-date">Tue Jul 14</div><div><div class="key-date-event">Semifinals</div><div class="key-date-detail">Final four · 2 matches</div></div></div>
-        <div class="key-date"><div class="key-date-date">Sat Jul 18</div><div><div class="key-date-event">3rd-place playoff</div><div class="key-date-detail">Losers of SF · Miami</div></div></div>
-        <div class="key-date final"><div class="key-date-date">Sun Jul 19</div><div><div class="key-date-event">🏆 FINAL</div><div class="key-date-detail">MetLife Stadium, East Rutherford NJ · 3 PM</div></div><div class="key-date-note">Champion crowned</div></div>
-      </div>
+      <h2>🏆 Knockout Stage</h2>
+      ${renderBracket()}
     </section>
 
     <section>
