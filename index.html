@@ -231,7 +231,7 @@ const BRACKET = {
       ['South Africa', 'Canada'],
       ['Netherlands', 'Morocco'],
       ['', ''],
-      ['', ''],
+      ['Spain', ''],
       ['United States', ''],
       ['', '']
     ],
@@ -245,7 +245,7 @@ const BRACKET = {
       ['Ivory Coast', 'Norway'],
       ['Mexico', ''],
       ['', ''],
-      ['Argentina', ''],
+      ['Argentina', 'Cape Verde'],
       ['Australia', ''],
       ['Switzerland', ''],
       ['', '']
@@ -271,15 +271,14 @@ const FLAGS = {
 // Scoring
 const PTS_BY_KEY = {'group':0, 'out_group':0, 'r32':2, 'r16':5, 'qf':9, 'sf':14, 'f':20, 'win':28};
 const STAGE_LABELS = {
-  'group': 'Group Stage', 'out_group': 'Eliminated (Groups)', 'r32': 'Round of 32',
-  'r16': 'Round of 16', 'qf': 'Quarterfinals', 'sf': 'Semifinals', 'f': 'Final', 'win': 'Champion'
+  'group': 'Group Stage', 'r32': 'Round of 32', 'r16': 'Round of 16', 'qf': 'Quarterfinals', 'sf': 'Semifinals', 'f': 'Final', 'win': 'Champion'
 };
 
 // === Team status ===
 // The furthest round each team has been confirmed to reach. Same for every
 // visitor (baked in, not per-browser) — update this as results come in.
-// Valid values: 'group' (default/no entry needed), 'out_group' (eliminated
-// in groups), 'r32', 'r16', 'qf', 'sf', 'f', 'win'.
+// Valid values: 'group' (default/no entry needed), 'r32', 'r16', 'qf',
+// 'sf', 'f', 'win'.
 const TEAM_STATUS = {
   'Mexico': 'r32',
   'United States': 'r32',
@@ -296,7 +295,9 @@ const TEAM_STATUS = {
   'Ivory Coast': 'r32',
   'Netherlands': 'r32',
   'Japan': 'r32',
-  'Australia': 'r32'
+  'Australia': 'r32',
+  'Spain': 'r32',
+  'Cape Verde': 'r32'
 };
 
 // State (just UI state — which tab is active — not scoring data)
