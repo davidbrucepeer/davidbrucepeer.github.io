@@ -228,14 +228,14 @@ const POOL = [{"key": "duke", "handle": "Duke / The Newsman", "picks": ["France"
 const BRACKET = {
   left: {
     r32: [
-      ['Germany', ''],
-      ['France', ''],
+      ['Germany', 'Paraguay'],
+      ['France', 'Sweden'],
       ['South Africa', 'Canada'],
       ['Netherlands', 'Morocco'],
       ['Portugal', 'Croatia'],
-      ['Spain', ''],
-      ['United States', ''],
-      ['Belgium', '']
+      ['Spain', 'Austria'],
+      ['United States', 'Bosnia and Herzegovina'],
+      ['Belgium', 'Senegal']
     ],
     r16: Array.from({length: 4}, () => ['', '']),
     qf: Array.from({length: 2}, () => ['', '']),
@@ -245,12 +245,12 @@ const BRACKET = {
     r32: [
       ['Brazil', 'Japan'],
       ['Ivory Coast', 'Norway'],
-      ['Mexico', ''],
-      ['England', ''],
+      ['Mexico', 'Ecuador'],
+      ['England', 'DR Congo'],
       ['Argentina', 'Cape Verde'],
       ['Australia', 'Egypt'],
-      ['Switzerland', ''],
-      ['Colombia', '']
+      ['Switzerland', 'Algeria'],
+      ['Colombia', 'Ghana']
     ],
     r16: Array.from({length: 4}, () => ['', '']),
     qf: Array.from({length: 2}, () => ['', '']),
@@ -304,7 +304,16 @@ const TEAM_STATUS = {
   'Egypt': 'r32',
   'England': 'r32',
   'Croatia': 'r32',
-  'Portugal': 'r32'
+  'Portugal': 'r32',
+  'Austria': 'r32',
+  'DR Congo': 'r32',
+  'Sweden': 'r32',
+  'Ghana': 'r32',
+  'Ecuador': 'r32',
+  'Bosnia and Herzegovina': 'r32',
+  'Algeria': 'r32',
+  'Paraguay': 'r32',
+  'Senegal': 'r32'
 };
 
 // State (just UI state — which tab is active — not scoring data)
