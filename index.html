@@ -178,10 +178,12 @@ table.roster-table .raw-col, table.roster-table .pool-col { width: 14%; }
   padding: 4px; display: flex; flex-direction: column; gap: 2px;
 }
 .bracket-team {
-  display: flex; align-items: center; justify-content: center; gap: 4px; padding: 4px; background: #f3f4f6; border-radius: 4px;
+  display: flex; align-items: center; justify-content: flex-start; gap: 5px; padding: 4px 7px; background: #f3f4f6; border-radius: 4px;
   font-size: 11px; font-weight: 600; color: #1a1a2e; min-height: 30px;
 }
-.bracket-flag { font-size: 24px; line-height: 1; }
+.bracket-flag { font-size: 18px; line-height: 1; flex-shrink: 0; }
+.bracket-flag-img { width: 24px; height: auto; border-radius: 2px; flex-shrink: 0; display: block; }
+.bracket-abbr { font-size: 11px; font-weight: 700; letter-spacing: 0.5px; color: #1a1a2e; }
 .bracket-final-col { display: flex; flex-direction: column; align-items: stretch; flex: 1 1 0; min-width: 0; }
 .bracket-final-match-wrap { flex: 1; display: flex; flex-direction: column; justify-content: center; }
 </style>
@@ -617,11 +619,43 @@ function renderTodayMatches() {
   return `<div class="today-matches">${cards}</div>`;
 }
 
+// === Flag image codes (flagcdn.com ISO 3166-1 alpha-2 lowercase) ===
+const FLAG_CODES = {
+  'France':'fr','Mexico':'mx','Ivory Coast':'ci','Czech Republic':'cz','Ghana':'gh',
+  'New Zealand':'nz','Brazil':'br','Switzerland':'ch','Sweden':'se','Croatia':'hr',
+  'Spain':'es','Portugal':'pt','Austria':'at','Egypt':'eg','Canada':'ca','Japan':'jp',
+  'Paraguay':'py','Algeria':'dz','Argentina':'ar','Germany':'de','Senegal':'sn',
+  'Cape Verde':'cv','Netherlands':'nl','Scotland':'gb-sct','United States':'us','Turkey':'tr',
+  'England':'gb-eng','Ecuador':'ec','Uruguay':'uy','South Korea':'kr','Colombia':'co',
+  'Bosnia and Herzegovina':'ba','Norway':'no','Belgium':'be','Morocco':'ma',
+  'South Africa':'za','Panama':'pa','Iraq':'iq','Curacao':'cw','Iran':'ir',
+  'Saudi Arabia':'sa','Tunisia':'tn','DR Congo':'cd','Uzbekistan':'uz','Australia':'au',
+  'Qatar':'qa','Jordan':'jo','Haiti':'ht'
+};
+
+// === Country abbreviations (ISO 3166-1 alpha-2 / FIFA codes) ===
+const ABBR = {
+  'France':'FRA','Mexico':'MEX','Ivory Coast':'CIV','Czech Republic':'CZE','Ghana':'GHA',
+  'New Zealand':'NZL','Brazil':'BRA','Switzerland':'SUI','Sweden':'SWE','Croatia':'CRO',
+  'Spain':'ESP','Portugal':'POR','Austria':'AUT','Egypt':'EGY','Canada':'CAN','Japan':'JPN',
+  'Paraguay':'PAR','Algeria':'ALG','Argentina':'ARG','Germany':'GER','Senegal':'SEN',
+  'Cape Verde':'CPV','Netherlands':'NED','Scotland':'SCO','United States':'USA','Turkey':'TUR',
+  'England':'ENG','Ecuador':'ECU','Uruguay':'URU','South Korea':'KOR','Colombia':'COL',
+  'Bosnia and Herzegovina':'BIH','Norway':'NOR','Belgium':'BEL','Morocco':'MAR',
+  'South Africa':'RSA','Panama':'PAN','Iraq':'IRQ','Curacao':'CUW','Iran':'IRN',
+  'Saudi Arabia':'KSA','Tunisia':'TUN','DR Congo':'COD','Uzbekistan':'UZB','Australia':'AUS',
+  'Qatar':'QAT','Jordan':'JOR','Haiti':'HAI','Sweden':'SWE','Japan':'JPN'
+};
+
 // === Knockout bracket rendering ===
 function bracketTeamHtml(name) {
   if (!name) return `<div class="bracket-team empty"></div>`;
-  const flag = FLAGS[name] || '';
-  return `<div class="bracket-team" title="${name}"><span class="bracket-flag">${flag}</span></div>`;
+  const code = FLAG_CODES[name];
+  const abbr = ABBR[name] || name.slice(0, 3).toUpperCase();
+  const flagImg = code
+    ? `<img class="bracket-flag-img" src="https://flagcdn.com/w40/${code}.png" alt="${name}" loading="lazy">`
+    : `<span class="bracket-flag">${FLAGS[name] || ''}</span>`;
+  return `<div class="bracket-team" title="${name}">${flagImg}<span class="bracket-abbr">${abbr}</span></div>`;
 }
 
 function renderBracketMatch(pair, roundClass) {
