@@ -122,6 +122,11 @@ table.standings .picks-cell { font-size: 12px; color: #6b7280; }
 
 .roster-pill.tier-4 { background: #fef2f2; } .roster-pill.tier-4 .pill-mult { background: #f87171; color: #7f1d1d; }
 
+/* Eliminated teams */
+.pick-eliminated { color: #9ca3af; text-decoration: line-through; text-decoration-color: #9ca3af; }
+tr.row-eliminated td { color: #9ca3af; text-decoration: line-through; text-decoration-color: #9ca3af; }
+tr.row-eliminated .mult-badge { opacity: 0.4; text-decoration: none; }
+
 /* Roster table */
 table.roster-table { table-layout: fixed; }
 table.roster-table .team-col { width: 30%; }
@@ -294,14 +299,6 @@ const STAGE_LABELS = {
   'group': 'Group Stage', 'r32': 'Round of 32', 'r16': 'Round of 16', 'qf': 'Quarterfinals', 'sf': 'Semifinals', 'f': 'Final', 'win': 'Champion'
 };
 
-// === Win-scenario simulator output ===
-// Generated from a 40,000-run correlated Monte Carlo of the remaining bracket
-// (real results locked in through the July 2 Round of 32 games; everything
-// after that simulated with Bradley-Terry match probabilities calibrated to
-// current market odds). For each player: their still-alive teams' required
-// depth in ~60%+ of the simulated scenarios where that player wins the pool
-// (or, for players with ~0% win probability, their best realistic top-3% outcomes).
-
 // === Team status ===
 // The furthest round each team has been confirmed to reach. Same for every
 // visitor (baked in, not per-browser) — update this as results come in.
@@ -341,6 +338,26 @@ const TEAM_STATUS = {
   'Algeria': 'r32',
   'Senegal': 'r32'
 };
+
+// Teams that have been knocked out. Add a team here when they lose.
+// Group-stage eliminations go here too, even if they never appear in TEAM_STATUS.
+const ELIMINATED = new Set([
+  // Group stage
+  'Czech Republic', 'Jordan', 'Scotland', 'Iraq', 'South Korea', 'Curacao',
+  'Iran', 'Haiti', 'Turkey', 'Qatar', 'Uruguay', 'Tunisia', 'Panama',
+  'Saudi Arabia', 'Uzbekistan', 'New Zealand',
+  // Round of 32
+  'Germany', 'South Africa', 'Netherlands', 'Japan', 'Australia', 'Cape Verde',
+  'Croatia', 'Austria', 'DR Congo', 'Sweden', 'Ghana', 'Ecuador',
+  'Bosnia and Herzegovina', 'Algeria', 'Senegal', 'Ivory Coast',
+  // Round of 16
+  'Mexico', 'United States', 'Paraguay', 'Colombia', 'Brazil', 'Canada',
+  'Egypt', 'Portugal',
+  // Quarterfinals
+  'Norway', 'Switzerland', 'Morocco', 'Belgium',
+  // Semifinals
+  'France'
+]);
 
 // State (just UI state — which tab is active — not scoring data)
 const STORAGE_KEY = 'wc2026_tracker_unified_v1';
@@ -439,7 +456,12 @@ function renderStandings(highlightKey) {
   const ranked = POOL.map(p => ({...p, total: playerTotal(p)})).sort((a,b) => b.total - a.total);
   const rows = ranked.map((p, i) => {
     const isHighlight = p.key === highlightKey;
-    const picksDisplay = p.picks.map(x => `${FLAGS[x]||''} ${x}`).join(' · ');
+    const picksDisplay = p.picks.map(x => {
+      const out = ELIMINATED.has(x);
+      return out
+        ? `<span class="pick-eliminated">${FLAGS[x]||''} ${x}</span>`
+        : `<strong>${FLAGS[x]||''} ${x}</strong>`;
+    }).join(' · ');
     return `<tr class="${isHighlight?'me':''}">
       <td class="rank-cell">${i+1}</td>
       <td>${p.handle}</td>
@@ -462,7 +484,8 @@ function renderRosterTable(player) {
     const stageLabel = STAGE_LABELS[status] || status;
     const rawPoints = PTS_BY_KEY[status] || 0;
     const poolPoints = pointsFor(t);
-    return `<tr>
+    const out = ELIMINATED.has(t);
+    return `<tr class="${out ? 'row-eliminated' : ''}">
       <td>${flag} ${t}</td>
       <td class="mult-cell"><span class="mult-badge tier-${mult}">${mult}x</span></td>
       <td>${stageLabel}</td>
