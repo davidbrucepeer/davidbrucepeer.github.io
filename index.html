@@ -190,6 +190,7 @@ table.roster-table .raw-col, table.roster-table .pool-col { width: 14%; }
 .bracket-flag-img { width: 24px; height: auto; border-radius: 2px; flex-shrink: 0; display: block; }
 .bracket-abbr { font-size: 11px; font-weight: 700; letter-spacing: 0.5px; color: #1a1a2e; }
 .bracket-final-col { display: flex; flex-direction: column; align-items: stretch; flex: 1 1 0; min-width: 0; }
+.bracket-champion-flag { font-size: 56px; text-align: center; line-height: 1; margin-bottom: 8px; }
 .bracket-final-match-wrap { flex: 1; display: flex; flex-direction: column; justify-content: center; }
 </style>
 </head>
@@ -322,7 +323,7 @@ const TEAM_STATUS = {
   'Netherlands': 'r32',
   'Japan': 'r32',
   'Australia': 'r32',
-  'Spain': 'f',
+  'Spain': 'win',
   'Cape Verde': 'r32',
   'Belgium': 'qf',
   'Egypt': 'r16',
@@ -356,7 +357,9 @@ const ELIMINATED = new Set([
   // Quarterfinals
   'Norway', 'Switzerland', 'Morocco', 'Belgium',
   // Semifinals
-  'France', 'England'
+  'France', 'England',
+  // Final
+  'Argentina'
 ]);
 
 // State (just UI state — which tab is active — not scoring data)
@@ -721,7 +724,10 @@ function renderBracket() {
   const finalHtml = `
     <div class="bracket-final-col">
       <div class="bracket-round-label">Final</div>
-      <div class="bracket-final-match-wrap">${renderBracketMatch(b.final, 'final')}</div>
+      <div class="bracket-final-match-wrap">
+        <div class="bracket-champion-flag">🇪🇸</div>
+        ${renderBracketMatch(b.final, 'final')}
+      </div>
     </div>`;
   return `<div class="bracket-wrap"><div class="bracket">${leftHtml}${finalHtml}${rightHtml}</div></div>`;
 }
